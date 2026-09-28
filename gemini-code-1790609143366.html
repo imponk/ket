@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keterangan Video PNG Generator (1080p - Full Width Right)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Oswald -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        /* Pattern catur untuk visualisasi transparansi PNG */
+        .checkerboard-bg {
+            background-color: #ffffff;
+            background-image: 
+                linear-gradient(45deg, #e5e7eb 25%, transparent 25%), 
+                linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #e5e7eb 75%), 
+                linear-gradient(-45deg, transparent 75%, #e5e7eb 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <header class="bg-slate-900 text-white py-4 px-6 shadow-md">
+        <div class="max-w-5xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid font-bold text-2xl text-blue-400 fa-closed-captioning"></i>
+                <h1 class="text-xl font-bold tracking-wide">Generator Keterangan Video (1080p)</h1>
+            </div>
+            <span class="text-xs bg-blue-600 text-white px-2.5 py-1 rounded-full font-medium">Overlay PNG Transparan</span>
+        </div>
+    </header>
+
+    <main class="max-w-5xl w-full mx-auto p-4 sm:p-6 flex-grow">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Panel Kontrol Input (Kiri) -->
+            <div class="lg:col-span-5 bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div class="space-y-5">
+                    <h2 class="text-lg font-bold text-slate-800 border-b pb-3 flex items-center">
+                        <i class="fa-solid fa-pen-to-square text-blue-600 mr-2"></i> Input Teks Keterangan
+                    </h2>
+
+                    <!-- Input Keterangan -->
+                    <div>
+                        <label for="inputText" class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">
+                            Teks Keterangan (Otomatis ALL CAPS)
+                        </label>
+                        <input type="text" id="inputText" value="DOKUMEN JAWA POS" 
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 uppercase font-semibold"
+                            placeholder="Contoh: DOKUMEN JAWA POS">
+                    </div>
+                </div>
+
+                <!-- Tombol Reset & Unduh -->
+                <div class="mt-6 pt-4 border-t border-slate-100 flex flex-col gap-2">
+                    <button id="btnDownload" class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Unduh PNG Transparan (1080p)</span>
+                    </button>
+                    <button id="btnReset" class="w-full py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium rounded-lg text-sm transition">
+                        Reset Ke Default
+                    </button>
+                </div>
+            </div>
+
+            <!-- Panel Preview Canvas (Kanan) -->
+            <div class="lg:col-span-7 bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center border-b pb-3 mb-4">
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center">
+                            <i class="fa-solid fa-eye text-blue-600 mr-2"></i> Pratinjau Hasil
+                        </h2>
+                        <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded">
+                            Background Catur = Transparan
+                        </span>
+                    </div>
+
+                    <!-- Container Canvas dengan checkerboard background -->
+                    <div class="checkerboard-bg p-6 rounded-xl border border-slate-300 flex items-center justify-center overflow-x-auto min-h-[250px]">
+                        <canvas id="tagCanvas" class="max-w-full h-auto shadow-md"></canvas>
+                    </div>
+                </div>
+
+                <!-- Petunjuk Penggunaan Singkat -->
+                <div class="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg text-xs text-blue-800 flex items-start space-x-2">
+                    <i class="fa-solid fa-circle-info text-blue-500 mt-0.5"></i>
+                    <span>Posisi font telah diturunkan 2px untuk penataan terpusat secara presisi di dalam kotak biru.</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-slate-800 text-slate-400 py-4 px-6 text-center text-xs">
+        <p>&copy; Generator Keterangan Video Transparan - Font Oswald Bold</p>
+    </footer>
+
+    <script>
+        document.fonts.ready.then(function() {
+            initApp();
+        });
+
+        function initApp() {
+            const canvas = document.getElementById('tagCanvas');
+            const ctx = canvas.getContext('2d');
+
+            const inputText = document.getElementById('inputText');
+
+            // Konfigurasi Desain
+            const CONFIG = {
+                canvasWidth: 1080,         // Lebar standar skala video Full HD
+                bgColor: '#004880',          // Warna Kotak (Biru Jawa Pos)
+                textColor: '#ffffff',        // Warna Teks (Putih)
+                fontSize: 54,                // Ukuran Font Oswald Bold
+                paddingX: 20,                // Padding Kiri Teks
+                paddingY: 10,                // Padding Vertikal/Bawah
+                leftMargin: 60,              // Area Transparan Sisi Kiri
+                topMargin: 20,               // Margin Atas Kanvas
+                offsetY: 4                   // Penyesuaian Vertikal Font (Ditambah 2px agar posisi teks turun)
+            };
+
+            function renderCanvas() {
+                const textValue = inputText.value.toUpperCase().trim() || "KETERANGAN";
+
+                // Hitung Tinggi Kotak
+                const boxHeight = Math.ceil(CONFIG.fontSize + (CONFIG.paddingY * 2));
+
+                // Dimensi Total Canvas
+                const canvasHeight = boxHeight + (CONFIG.topMargin * 2);
+
+                canvas.width = CONFIG.canvasWidth;
+                canvas.height = canvasHeight;
+
+                // Bersihkan Canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // --- 1. GAMBAR KOTAK BIRU ---
+                const boxX = CONFIG.leftMargin;
+                const boxY = CONFIG.topMargin;
+                const boxWidth = CONFIG.canvasWidth - CONFIG.leftMargin;
+
+                ctx.fillStyle = CONFIG.bgColor;
+                ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+
+                // --- 2. GAMBAR TEKS KETERANGAN ---
+                ctx.fillStyle = CONFIG.textColor;
+                ctx.font = `700 ${CONFIG.fontSize}px Oswald`;
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+
+                const textX = boxX + CONFIG.paddingX;
+                const textCenterY = boxY + (boxHeight / 2) + CONFIG.offsetY;
+
+                ctx.fillText(textValue, textX, textCenterY);
+            }
+
+            // Event Listener Live Input
+            inputText.addEventListener('input', renderCanvas);
+
+            // Tombol Reset ke Default
+            document.getElementById('btnReset').addEventListener('click', function() {
+                inputText.value = "DOKUMEN JAWA POS";
+                renderCanvas();
+            });
+
+            // Tombol Unduh PNG Transparan
+            document.getElementById('btnDownload').addEventListener('click', function() {
+                const dataURL = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                const sanitizedText = inputText.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '-') || 'keterangan';
+                link.download = `keterangan-${sanitizedText}-1080p.png`;
+                link.href = dataURL;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+
+            // Render Awal
+            renderCanvas();
+        }
+    </script>
+</body>
+</html>
